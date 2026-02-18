@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  explorer:
+    build:
+      context: .
+      dockerfile: Dockerfile.explorer
+    container_name: app3-explorer
+    environment:
+      PORT: "4173"
+      ZEKO_SEQUENCER_URL: "https://testnet.zeko.io/graphql"
+      ZEKO_V2_INDEXER_URL: "http://indexer-api:8787"
+    ports:
+      - "4173:4173"
+    depends_on:
+      - postgres
+      - indexer-api
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: app3-postgres
+    environment:
+      POSTGRES_USER: zeko
+      POSTGRES_PASSWORD: zeko
+      POSTGRES_DB: zeko_indexer
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+
+  indexer-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.indexer-api
+    container_name: app3-indexer-api
+    environment:
+      PORT: "8787"
+      PGHOST: "postgres"
+      PGPORT: "5432"
+      PGUSER: "zeko"
+      PGPASSWORD: "zeko"
+      PGDATABASE: "zeko_indexer"
+      DEFAULT_SEQUENCER_URL: "https://testnet.zeko.io/graphql"
+      START_MODE: "latest"
+      BACKFILL_ACK: "false"
+      INGEST_ENABLED: "true"
+      INGEST_INTERVAL_SEC: "30"
+    ports:
+      - "8787:8787"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:4
+    container_name: app3-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>app3-explorer</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Local Explorer for Zeko Rollups</h1>
+      <p>
+        Point to any Zeko sequencer endpoint and inspect account-level transactions and metadata.
+        V1 is lightweight/account-scoped; V2 adds indexer-backed global lookup and history. See README for setup and migration.
+      </p>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Network Profiles</h2>
+        <div class="row profileRow">
+          <label>
+            Saved Profiles
+            <select id="profileSelect"></select>
+          </label>
+          <button id="useProfileBtn" type="button">Use Selected</button>
+          <button id="deleteProfileBtn" type="button">Delete Selected</button>
+        </div>
+        <div class="row profileRow">
+          <label>
+            Profile Name
+            <input id="profileName" placeholder="Local Devnet" />
+          </label>
+          <label class="grow">
+            Sequencer GraphQL URL
+            <input id="profileUrl" placeholder="http://127.0.0.1:8080/graphql" />
+          </label>
+          <button id="saveProfileBtn" type="button">Save / Update</button>
+        </div>
+        <p class="hint" id="activeProfileSummary"></p>
+      </section>
+
+      <section class="card">
+        <h2>Network Health</h2>
+        <div class="row">
+          <button id="refreshHealth">Refresh</button>
+          <button id="toggleHealthDetailsBtn" type="button">Show Full Details</button>
+        </div>
+        <p class="statusLine">
+          Status:
+          <span id="healthPill" class="pill">Unknown</span>
+        </p>
+        <p id="healthMeta" class="hint"></p>
+        <pre id="healthDetails" class="output hidden"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Account / Contract Lookup</h2>
+        <form id="accountForm">
+          <label>
+            Public Key
+            <input id="accountPublicKey" placeholder="B62..." required />
+          </label>
+          <label>
+            Token ID (optional)
+            <input id="accountTokenId" placeholder="1" />
+          </label>
+          <button type="submit">Lookup Account</button>
+        </form>
+        <pre id="accountOutput" class="output"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Transaction Lookup</h2>
+        <form id="txForm">
+          <label>
+            Transaction Hash
+            <input id="txHash" placeholder="5J..." required />
+          </label>
+          <label>
+            Public Key (optional, enables V1 lookup)
+            <input id="txPublicKey" placeholder="B62..." />
+          </label>
+          <label>
+            Token ID (optional)
+            <input id="txTokenId" placeholder="1" />
+          </label>
+          <button type="submit">Find Tx</button>
+        </form>
+        <p class="hint">
+          V1 behavior: providing `Public Key` scans that account's archive-backed actions/events and tries to match the hash.
+          This works best for zkApp-related tx that emitted account events/actions.
+        </p>
+        <p class="hint">
+          V1 may miss plain payments and other tx types that are not represented in that account's action/event history.
+          For full-chain hash lookup and complete account tx history, use V2 indexer.
+        </p>
+        <pre id="txOutput" class="output"></pre>
+      </section>
+
+      <section class="grid2">
+        <section class="card">
+          <h2>Events</h2>
+          <form id="eventsForm">
+            <label>
+              Public Key
+              <input id="eventsPublicKey" placeholder="B62..." required />
+            </label>
+            <label>
+              Token ID (optional)
+              <input id="eventsTokenId" placeholder="1" />
+            </label>
+            <button type="submit">Fetch Events</button>
+          </form>
+          <pre id="eventsOutput" class="output"></pre>
+        </section>
+
+        <section class="card">
+          <h2>Actions</h2>
+          <form id="actionsForm">
+            <label>
+              Public Key
+              <input id="actionsPublicKey" placeholder="B62..." required />
+            </label>
+            <label>
+              Token ID (optional)
+              <input id="actionsTokenId" placeholder="1" />
+            </label>
+            <label>
+              fromActionState (optional)
+              <input id="actionsFrom" placeholder="Field string" />
+            </label>
+            <label>
+              endActionState (optional)
+              <input id="actionsTo" placeholder="Field string" />
+            </label>
+            <button type="submit">Fetch Actions</button>
+          </form>
+          <pre id="actionsOutput" class="output"></pre>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
